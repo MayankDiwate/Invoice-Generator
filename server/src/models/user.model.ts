@@ -1,13 +1,13 @@
-import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
 import pkg from "validator";
 const { isEmail } = pkg;
 
 export type UserType = {
-  _id: String,
-  username: String,
-  email: String,
-  password: String,
+  _id: mongoose.Schema.Types.ObjectId;
+  username: string;
+  email: string;
+  password: string;
 };
 
 const userSchema = new mongoose.Schema(

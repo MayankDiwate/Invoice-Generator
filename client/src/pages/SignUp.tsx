@@ -43,8 +43,9 @@ const SignUp = () => {
 
     try {
       dispatch(signInStart());
-      const res = await fetch(`localhost:3000/api/auth/signin`, {
+      const res = await fetch('http://localhost:5001/api/auth/signup', {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -60,8 +61,8 @@ const SignUp = () => {
         return;
       }
       dispatch(signInSuccess(data));
-      toast.success("User signed in successfully");
-      navigate("/");
+      toast.success("User registered successfully");
+      navigate("/signin");
     } catch (error) {
       dispatch(signInFailure((error as Error).message));
       toast.error((error as Error).message);
@@ -72,7 +73,7 @@ const SignUp = () => {
     <div className="p-3 max-w-lg mx-auto flex flex-col justify-center h-screen">
       <h1 className="text-3xl font-semibold text-center my-7">Sign Up</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <input
+        <input
           type="text"
           placeholder="Username"
           className="border p-3 rounded-lg"

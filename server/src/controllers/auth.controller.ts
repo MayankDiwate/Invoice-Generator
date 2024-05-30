@@ -1,8 +1,10 @@
 import bcryptjs from "bcryptjs";
+import { config } from "dotenv";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import User, { UserType } from "../models/user.model.js";
-import { errorHandler } from "../utils/error.js";
+import User from "../models/user.model";
+import { errorHandler } from "../utils/error";
+config();
 
 export const signup = async (
   req: Request,
@@ -49,7 +51,7 @@ export const signin = async (
   const { email, password } = req.body;
 
   try {
-    const user: UserType | null = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!email || !password) {
       return next(errorHandler(401, "All fields are required!"));
@@ -59,21 +61,27 @@ export const signin = async (
       return next(errorHandler(404, "User not found!"));
     }
 
-    const isMatch = bcryptjs.compareSync(password, (user as any).password);
+    const isMatch = bcryptjs.compare(password, user.password);
     if (!isMatch) {
       return next(errorHandler(401, "Wrong password!"));
     }
 
-    const token = jwt.sign({ id: user._id }, `${process.env.JWT_SECRET_KEY}`, {
+    const token = jwt.sign({ id: user._id }, 'NkCHChjrYthCqco4OWBtIgD0YhKP9Okr', {
       expiresIn: "1d",
     });
 
-    res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
     const { password: pass, ...rest } = (user as any)._doc;
-    res.status(200).json(rest);
-  } catch (error) {
-    next(error);
+    res
+      .status(200)
+      .json({ message: "User signed in successfully", user: rest });
+  } catch (error: any) {
+    console.log(error.message);
+    next(new Error(error.message));
   }
 };
 

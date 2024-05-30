@@ -3,17 +3,17 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { RootState } from "../redux/store";
 import {
   signInFailure,
   signInStart,
   signInSuccess,
 } from "../redux/user/userSlice";
-import { RootState } from "../redux/store";
 
 export type SignInType = {
   email: string;
   password: string;
-}
+};
 
 const SignIn = () => {
   const [formData, setFormData] = useState<SignInType>({
@@ -23,16 +23,16 @@ const SignIn = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [passwordType, setPasswordType] = useState("password");
-  const { loading, error } = useSelector((state : RootState) => state.user);
+  const { loading } = useSelector((state: RootState) => state.user);
 
-  const handleChange = (event : React.FormEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [event.currentTarget.id]: event.currentTarget.value,
     });
   };
 
-  const handleSubmit = async (event : React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (formData.email === "" || formData.password === "") {
@@ -41,22 +41,21 @@ const SignIn = () => {
 
     try {
       dispatch(signInStart());
-      const res = await fetch(
-        `localhost:3000/api/auth/signin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch('http://localhost:5001/api/auth/signin', {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       const data = await res.json();
 
+      console.log(data);
+
       if (data.success === false) {
         dispatch(signInFailure(data.message));
-        console.log(error);
         toast.error(data.message);
         return;
       }
@@ -78,7 +77,7 @@ const SignIn = () => {
           placeholder="Email"
           className="border p-3 rounded-lg"
           id="email"
-          onChange={(e : React.FormEvent<HTMLInputElement>) => handleChange(e)}
+          onChange={handleChange}
         />
         <div className="w-full relative">
           <input
@@ -116,7 +115,7 @@ const SignIn = () => {
         </button>
       </form>
 
-      <div className="flex gap-1 justify-end mt-2">
+      <div className="flex gap-1 items-center justify-end mt-2">
         <p className="text-sm text-gray-400">Dont have an account?</p>
         <Link to="/signup">
           <span className="text-blue-700 hover:underline text-sm">Sign up</span>
