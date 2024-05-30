@@ -10,13 +10,15 @@ import {
   signInSuccess,
 } from "../redux/user/userSlice";
 
-type SignInType = {
+export type SignUpType = {
+  username: string;
   email: string;
   password: string;
 };
 
 const SignUp = () => {
-  const [formData, setFormData] = useState<SignInType>({
+  const [formData, setFormData] = useState<SignUpType>({
+    username: "",
     email: "",
     password: "",
   });

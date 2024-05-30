@@ -10,7 +10,7 @@ import {
 } from "../redux/user/userSlice";
 import { RootState } from "../redux/store";
 
-type SignInType = {
+export type SignInType = {
   email: string;
   password: string;
 }
