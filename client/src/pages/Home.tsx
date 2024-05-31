@@ -1,24 +1,18 @@
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import AddInvoiceSheet from "@/components/AddInvoiceSheet";
+import Header from "@/components/Header";
+import InvoiceTable from "@/components/InvoiceTable";
 
 const Home = () => {
-  const navigate = useNavigate();
-  const handleLogout = async () => {
-    await fetch("http://localhost:5001/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    toast.success("User logged out successfully!");
-    navigate("/signin");
-  };
-
   return (
     <div>
-      <button onClick={handleLogout}>Logout</button>
+      <Header />
+      <div className="mt-8 mx-10">
+        <div className="flex justify-between mb-4">
+          <h1 className="text-xl font-bold">Invoices</h1>
+          <AddInvoiceSheet />
+        </div>
+        <InvoiceTable />
+      </div>
     </div>
   );
 };
