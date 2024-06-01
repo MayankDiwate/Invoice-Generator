@@ -39,7 +39,7 @@ const Products = () => {
   };
 
   const getInvoice = async () => {
-    const response = await fetch("http://localhost:5001/api/invoices", {
+    const response = await fetch("http://localhost:5001/api/invoice", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -60,7 +60,7 @@ const Products = () => {
 
   const handleGeneratePDF = async () => {
     setLoading(true);
-    await fetch(`http://localhost:5001/api/invoices/generatePDF/${id}`, {
+    await fetch(`http://localhost:5001/api/product/generatePDF/${id}`, {
       method: "POST",
       credentials: "include",
       headers: {

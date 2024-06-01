@@ -37,7 +37,7 @@ const AddProductSheet = () => {
     }
 
     const res = await fetch(
-      `http://localhost:5001/api/invoices/addProduct/${id}`,
+      `http://localhost:5001/api/product/addProduct/${id}`,
       {
         method: "POST",
         credentials: "include",

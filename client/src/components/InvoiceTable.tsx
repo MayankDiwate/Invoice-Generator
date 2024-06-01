@@ -15,14 +15,14 @@ import { useNavigate } from "react-router-dom";
 const InvoiceTable = () => {
   const navigate = useNavigate();
   const { invoices } = useAppSelector((state: RootState) => state.invoices);
-  const [invoiceList, setInvoiceList] = useState<Invoice[]>(invoices);
+  const [invoiceList, setInvoiceList] = useState<Invoice[]>([]);
   const currentUser: {
     message: string;
     user: UserType;
   } | null = useAppSelector((state: RootState) => state.user.currentUser);
 
   const getInvoices = async () => {
-    const response = await fetch("http://localhost:5001/api/invoices", {
+    const response = await fetch("http://localhost:5001/api/invoice", {
       method: "POST",
       credentials: "include",
       headers: {

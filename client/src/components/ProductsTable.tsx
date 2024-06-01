@@ -31,7 +31,7 @@ const ProductsTable = () => {
   };
 
   const getProducts = async () => {
-    const response = await fetch(`http://localhost:5001/api/invoices/${id}`, {
+    const response = await fetch(`http://localhost:5001/api/product/${id}`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -51,7 +51,7 @@ const ProductsTable = () => {
   useEffect(() => {
     getTotal();
     getProducts();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products.length]);
 
   return (
