@@ -24,8 +24,8 @@ const Home = () => {
     <div>
       <Header />
       <div className="mt-8 mx-10">
-        <div className="flex justify-between mb-4">
-          <h1 className="text-xl font-bold">Invoices</h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-xl font-bold ml-2">Invoices</h1>
           <AddInvoiceSheet />
         </div>
         <InvoiceTable />

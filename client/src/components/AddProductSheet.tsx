@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAppDispatch } from "@/redux/hooks";
+import { addProduct } from "@/redux/slices/productSlice";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +18,9 @@ import {
 import { Separator } from "./ui/separator";
 
 const AddProductSheet = () => {
+  const dispatch = useAppDispatch();
   const { id } = useParams();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [rate, setRate] = useState(0);
@@ -32,23 +36,39 @@ const AddProductSheet = () => {
       toast.error("Please enter valid quantity and rate");
     }
 
-    await fetch(`http://localhost:5001/api/invoices/addProduct/${id}`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        invoiceId: id,
-        name,
-        quantity,
-        rate,
-      }),
-    });
+    const res = await fetch(
+      `http://localhost:5001/api/invoices/addProduct/${id}`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          invoiceId: id,
+          name,
+          quantity,
+          rate,
+        }),
+      }
+    );
+
+    const data = await res.json();
 
     setOpen(false);
-    window.location.reload();
-    toast.success("Product added successfully!");
+    dispatch(addProduct(data["product"]));
+
+    if (!res.ok) {
+      toast.error(data.message);
+    }
+
+    navigate(`/${data['product']._id}`);
+
+    if(data.message === "Product added successfully") {
+      toast.success(data.message);
+    } else {
+      toast.error(data.message);
+    }
   };
 
   return (

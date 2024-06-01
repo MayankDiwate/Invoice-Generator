@@ -2,24 +2,32 @@ import { NextFunction, Request, Response } from "express";
 import Invoice from "../models/invoice.model";
 import { errorHandler } from "../utils/error";
 
-export const addInvoice = (req: Request, res: Response, next: NextFunction) => {
+export const addInvoice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { invoiceName, userId } = req.body;
 
   if (!invoiceName) {
-    return next(errorHandler(500, "Username is required"));
+    return next(errorHandler(500, "Invoice name is required"));
   }
 
   try {
-    const newUser = new Invoice({
+    const invoice = await Invoice.findOne({ invoiceName, userId });
+    if (invoice) {
+      return res.status(500).json({ message: "Invoice already exists" });
+    }
+    const newInvoice = new Invoice({
       userId,
       invoiceName,
     });
 
-    newUser.save();
+    newInvoice.save();
 
     res.status(200).json({
-      message: "User added successfully",
-      user: { invoiceName },
+      message: "Invoice added successfully",
+      invoice: newInvoice,
     });
   } catch (error: any) {
     next(error.message);

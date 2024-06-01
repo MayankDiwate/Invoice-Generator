@@ -7,6 +7,7 @@ import { UserType } from "@/types/User";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import {
 
 const AddInvoiceSheet = () => {
   const { loading } = useAppSelector((state: RootState) => state.invoices);
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [invoiceName, setInvoiceName] = useState("");
   const [open, setOpen] = useState(false);
@@ -45,8 +47,12 @@ const AddInvoiceSheet = () => {
 
     dispatch(addInvoice(data));
     setOpen(false);
-    window.location.reload();
-    toast.success("User added successfully!");
+    navigate(`/${data["invoice"]["_id"]}`);
+    if (data["message"] === "Invoice added successfully") {
+      toast.success(data["message"]);
+    } else {
+      toast.error(data["message"]);
+    }
   };
 
   return (

@@ -4,4 +4,5 @@ export type Product = {
   name: string;
   quantity: number;
   rate: number;
+  total: number;
 };

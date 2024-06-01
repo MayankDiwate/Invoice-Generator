@@ -70,6 +70,9 @@ const SignIn = () => {
 
   return (
     <div className="p-3 max-w-lg mx-auto flex flex-col justify-center h-screen">
+      <h1 className="text-5xl font-semibold text-center my-7">
+        Invoice Generator
+      </h1>
       <h1 className="text-3xl font-semibold text-center my-7">Sign In</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input

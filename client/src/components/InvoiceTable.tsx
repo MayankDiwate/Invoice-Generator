@@ -14,8 +14,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 const InvoiceTable = () => {
   const navigate = useNavigate();
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-
+  const { invoices } = useAppSelector((state: RootState) => state.invoices);
+  const [invoiceList, setInvoiceList] = useState<Invoice[]>(invoices);
   const currentUser: {
     message: string;
     user: UserType;
@@ -34,17 +34,17 @@ const InvoiceTable = () => {
     });
 
     const data = await response.json();
-    setInvoices(data);
+    setInvoiceList(data);
   };
 
   useEffect(() => {
     getInvoices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoices.length]);
 
   return (
     <>
-      {invoices.length === 0 ? (
+      {invoiceList.length === 0 ? (
         <div className="flex items-center justify-center h-[34rem] text-md mx-2">
           No Invoices Found!
         </div>
@@ -57,7 +57,7 @@ const InvoiceTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices.map((invoice: Invoice, index) => {
+            {invoiceList.map((invoice: Invoice, index) => {
               return (
                 <TableRow
                   key={index}

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import fs from "fs";
 import handlebars from "handlebars";
 import puppeteer from "puppeteer";
+import { uuid } from "uuidv4";
 import { InvoiceData } from "../models/invoiceData.model";
 import Product from "../models/product.model";
 import { errorHandler } from "../utils/error";
@@ -32,7 +33,7 @@ export const addProductById = async (
 
     await product.save();
 
-    res.json({ message: "Product added successfully" });
+    res.json({ message: "Product added successfully", product });
   } catch (error: any) {
     next(error.message);
   }
@@ -50,7 +51,9 @@ export const getProducts = async (
   }
 
   try {
-    const products = await Product.find({ invoiceId: id });
+    const products = await Product.find({ invoiceId: id }).sort({
+      createdAt: -1,
+    });
     res.status(200).json(products);
   } catch (error: any) {
     next(error.message);
