@@ -3,12 +3,12 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { RootState } from "../redux/store";
 import {
   signInFailure,
   signInStart,
   signInSuccess,
-} from "../redux/user/userSlice";
+} from "../redux/slices/userSlice";
+import { RootState } from "../redux/store";
 
 export type SignUpType = {
   username: string;
@@ -43,7 +43,7 @@ const SignUp = () => {
 
     try {
       dispatch(signInStart());
-      const res = await fetch('http://localhost:5001/api/auth/signup', {
+      const res = await fetch("http://localhost:5001/api/auth/signup", {
         method: "POST",
         credentials: "include",
         headers: {

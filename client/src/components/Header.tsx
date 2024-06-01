@@ -1,3 +1,7 @@
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import { UserType } from "@/types/User";
+import { LogOut, Mail, User } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -9,10 +13,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogOut } from "lucide-react";
 
 const Header = () => {
   const navigate = useNavigate();
+  const currentUser: {
+    message: string;
+    user: UserType;
+  } | null = useAppSelector((state: RootState) => state.user.currentUser);
 
   const handleSignOut = async () => {
     await fetch("http://localhost:5001/api/auth/logout", {
@@ -43,8 +50,21 @@ const Header = () => {
           <DropdownMenuContent>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem className="flex items-center gap-1 ml-1">
+              <User size={18} />
+              {currentUser!["user"].username ?? "Username"}
+            </DropdownMenuItem>
+            <DropdownMenuItem className="flex items-center gap-1 ml-1">
+              <Mail size={16} />
+              {currentUser!["user"].email ?? "Email"}
+            </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
-              <div onClick={handleSignOut} className="flex items-center gap-1 ml-1"><LogOut size={16} /> Sign out</div>
+              <div
+                onClick={handleSignOut}
+                className="flex items-center gap-1 ml-1"
+              >
+                <LogOut size={16} /> Sign out
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

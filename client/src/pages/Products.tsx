@@ -2,9 +2,104 @@ import AddProductSheet from "@/components/AddProductSheet";
 import Header from "@/components/Header";
 import ProductsTable from "@/components/ProductsTable";
 import { Button } from "@/components/ui/button";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import { Product } from "@/types/Product";
+import { UserType } from "@/types/User";
 import { Download } from "lucide-react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
 
 const Products = () => {
+  const currentUser: {
+    message: string;
+    user: UserType;
+  } | null = useAppSelector((state: RootState) => state.user.currentUser);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [invoiceName, setInvoiceName] = useState("");
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+
+  const getTotal = () => {
+    const _total = products
+      .map((product: Product) => product.rate * product.quantity)
+      .reduce((a, b) => a + b, 0);
+
+    setTotal(_total);
+  };
+
+  const getInvoice = async () => {
+    const response = await fetch("http://localhost:5001/api/invoices", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: currentUser!["user"]._id,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message);
+    }
+    setInvoiceName(data.username);
+  };
+
+  const getProducts = async () => {
+    const response = await fetch(`http://localhost:5001/api/invoices/${id}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message);
+    }
+
+    setProducts(data);
+  };
+
+  const handleGeneratePDF = async () => {
+    setLoading(true);
+    await fetch(`http://localhost:5001/api/invoices/generatePDF/${id}`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        invoiceName,
+        total,
+      }),
+    });
+
+    setLoading(false);
+    toast.success("PDF generated successfully!");
+    // toast.promise(handleGeneratePDF(), {
+    //   loading: "Downloading PDF...",
+    //   success: <b>PDF saved successfully.</b>,
+    //   error: <b>Could not save PDF.</b>,
+    // });
+  };
+
+  useEffect(() => {
+    getInvoice();
+    getProducts();
+  });
+
+  useEffect(() => {
+    getTotal();
+  }, [products]);
+
   return (
     <div>
       <Header />
@@ -13,13 +108,18 @@ const Products = () => {
           <h1 className="text-xl font-bold">Products</h1>
           <div className="flex gap-2">
             <AddProductSheet />
-            <Button size={"sm"} className="flex gap-2">
-              <Download size={16} /> 
-              <span className="hidden sm:block">Generate Invoice</span>
+            <Button
+              size={"sm"}
+              className="flex gap-2"
+              onClick={handleGeneratePDF}
+              disabled={loading}
+            >
+              <Download size={16} />
+              <span>{loading ? "Downloading PDF..." : "Download PDF"}</span>
             </Button>
           </div>
         </div>
-        <ProductsTable />
+        <ProductsTable products={products} total={total} />
       </div>
     </div>
   );

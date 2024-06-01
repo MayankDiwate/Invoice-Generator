@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export type Invoice = {
   _id: mongoose.Schema.Types.ObjectId;
   userId: mongoose.Schema.Types.ObjectId;
-  username: string;
+  invoiceName: string;
 };
 
 const invoiceSchema = new mongoose.Schema({
@@ -11,7 +11,7 @@ const invoiceSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  username: {
+  invoiceName: {
     type: String,
     required: [true, "Username is required"],
   },

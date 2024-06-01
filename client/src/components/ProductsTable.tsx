@@ -8,40 +8,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Product } from "@/types/Product";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
-const ProductsTable = () => {
-  const { id } = useParams();
-  const [products, setProducts] = useState([]);
-  const [total, setTotal] = useState(0);
-
-  const getTotal = () => {
-    let total = 0;
-    products.forEach((product: Product) => {
-      total += product.rate * product.quantity;
-    });
-    setTotal(total);
-  };
-
-  const getProducts = async () => {
-    const response = await fetch(`http://localhost:5001/api/invoices/${id}`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-
-    setProducts(data);
-  };
-
-  useEffect(() => {
-    getProducts();
-    getTotal();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [products]);
+const ProductsTable = ({
+  products,
+  total,
+}: {
+  products: Product[];
+  total: number;
+}) => {
   return (
     <div>
       {products.length === 0 ? (
@@ -63,9 +37,9 @@ const ProductsTable = () => {
               <TableRow key={product._id}>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>{product.quantity}</TableCell>
-                <TableCell>${product.rate}</TableCell>
+                <TableCell>₹{product.rate}</TableCell>
                 <TableCell className="text-right">
-                  ${product.rate * product.quantity}
+                  ₹{product.rate * product.quantity}
                 </TableCell>
               </TableRow>
             ))}
@@ -73,8 +47,12 @@ const ProductsTable = () => {
           {products.length > 0 && (
             <TableFooter>
               <TableRow>
+                <TableCell colSpan={3}>GST (18%)</TableCell>
+                <TableCell className="text-right">₹{total * 0.18}</TableCell>
+              </TableRow>
+              <TableRow>
                 <TableCell colSpan={3}>Total</TableCell>
-                <TableCell className="text-right">${total}</TableCell>
+                <TableCell className="text-right">₹{total * 1.18}</TableCell>
               </TableRow>
             </TableFooter>
           )}

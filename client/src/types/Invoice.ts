@@ -1,4 +1,4 @@
 export type Invoice = {
   _id: string;
-  username: string;
+  invoiceName: string;
 };

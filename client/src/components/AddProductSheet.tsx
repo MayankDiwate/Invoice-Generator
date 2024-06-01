@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
@@ -13,7 +14,6 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Separator } from "./ui/separator";
-import { Plus } from "lucide-react";
 
 const AddProductSheet = () => {
   const { id } = useParams();
@@ -25,7 +25,14 @@ const AddProductSheet = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await fetch(`http://localhost:5001/api/invoices/${id}`, {
+    if (!name || !quantity || !rate) {
+      toast.error("Please fill all the fields");
+      return;
+    } else if (rate < 0 || quantity < 0) {
+      toast.error("Please enter valid quantity and rate");
+    }
+
+    await fetch(`http://localhost:5001/api/invoices/addProduct/${id}`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -40,13 +47,21 @@ const AddProductSheet = () => {
     });
 
     setOpen(false);
+    window.location.reload();
     toast.success("Product added successfully!");
   };
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Button size={"sm"} className="flex gap-2" onClick={() => setOpen(true)}><Plus  size={16}/>Add Product</Button>
+        <Button
+          size={"sm"}
+          className="flex gap-2"
+          onClick={() => setOpen(true)}
+        >
+          <Plus size={16} />
+          <span className="hidden sm:block">Add Product</span>
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -62,6 +77,7 @@ const AddProductSheet = () => {
                     id="name"
                     type="text"
                     className="col-span-3"
+                    required
                     onChange={(e: React.FormEvent<HTMLInputElement>) =>
                       setName(e.currentTarget.value)
                     }
@@ -74,6 +90,7 @@ const AddProductSheet = () => {
                   <Input
                     id="number"
                     min={1}
+                    required
                     onChange={(e: React.FormEvent<HTMLInputElement>) =>
                       setQuantity(parseInt(e.currentTarget.value))
                     }
@@ -89,6 +106,7 @@ const AddProductSheet = () => {
                     id="number"
                     placeholder="Rate"
                     type="number"
+                    required
                     className="col-span-3"
                     onChange={(e: React.FormEvent<HTMLInputElement>) =>
                       setRate(parseInt(e.currentTarget.value))
@@ -98,11 +116,11 @@ const AddProductSheet = () => {
                 <Separator />
                 <div className="flex justify-between items-center px-2">
                   <div>GST (18%)</div>
-                  <div>{rate * 0.18}</div>
+                  <div>₹{rate * 0.18}</div>
                 </div>
                 <div className="flex justify-between items-center px-2">
                   <div>Total</div>
-                  <div>{rate * quantity * 1.18}</div>
+                  <div>₹{rate * quantity * 1.18}</div>
                 </div>
                 <Separator />
 

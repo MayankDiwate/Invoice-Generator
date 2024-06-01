@@ -4,6 +4,6 @@ import verifyToken from "../utils/verifyToken";
 
 const router = express.Router();
 
-router.post("/addInvoice",verifyToken, addInvoice);
+router.post("/addInvoice", verifyToken, addInvoice);
 
 export default router;

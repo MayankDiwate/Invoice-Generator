@@ -6,29 +6,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 import { Invoice } from "@/types/Invoice";
+import { UserType } from "@/types/User";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 const InvoiceTable = () => {
   const navigate = useNavigate();
-  const [invoices, setInvoices] = useState([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
-  const getUsers = async () => {
+  const currentUser: {
+    message: string;
+    user: UserType;
+  } | null = useAppSelector((state: RootState) => state.user.currentUser);
+
+  const getInvoices = async () => {
     const response = await fetch("http://localhost:5001/api/invoices", {
-      method: "GET",
+      method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        userId: currentUser!["user"]._id,
+      }),
     });
-    const data = await response.json();
 
+    const data = await response.json();
     setInvoices(data);
   };
 
   useEffect(() => {
-    getUsers();
-  }, [invoices]);
+    getInvoices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       {invoices.length === 0 ? (
@@ -40,14 +53,14 @@ const InvoiceTable = () => {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">Id</TableHead>
-              <TableHead className="text-center">Username</TableHead>
+              <TableHead className="text-center">Invoice Name</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices.map((invoice: Invoice) => {
+            {invoices.map((invoice: Invoice, index) => {
               return (
                 <TableRow
-                  key={invoice._id}
+                  key={index}
                   onClick={() => {
                     navigate(`/${invoice._id}`);
                   }}
@@ -55,7 +68,7 @@ const InvoiceTable = () => {
                 >
                   <TableCell className="font-medium">{invoice._id}</TableCell>
                   <TableCell className="text-center">
-                    {invoice.username}
+                    {invoice.invoiceName}
                   </TableCell>
                 </TableRow>
               );

@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { addInvoice } from "@/redux/slices/invoiceSlice";
+import { RootState } from "@/redux/store";
+import { UserType } from "@/types/User";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -13,27 +17,40 @@ import {
 } from "./ui/dialog";
 
 const AddInvoiceSheet = () => {
+  const { loading } = useAppSelector((state: RootState) => state.invoices);
+  const dispatch = useAppDispatch();
+  const [invoiceName, setInvoiceName] = useState("");
   const [open, setOpen] = useState(false);
+  const currentUser: {
+    message: string;
+    user: UserType;
+  } | null = useAppSelector((state: RootState) => state.user.currentUser);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await fetch("http://localhost:5001/api/user/addInvoice", {
+    const res = await fetch("http://localhost:5001/api/user/addInvoice", {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: e.currentTarget.username.value,
+        invoiceName,
+        userId: currentUser!["user"]._id,
       }),
     });
 
+    const data = await res.json();
+
+    dispatch(addInvoice(data));
     setOpen(false);
+    window.location.reload();
     toast.success("User added successfully!");
   };
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
         <Button
           size={"sm"}
@@ -46,20 +63,25 @@ const AddInvoiceSheet = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Username</DialogTitle>
+          <DialogTitle>Add Invoice name</DialogTitle>
           <DialogDescription>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 py-4">
                 <div className="flex items-center gap-4">
                   <Input
-                    id="username"
-                    placeholder="Username"
+                    id="name"
+                    required
+                    placeholder="Invoice Name"
                     type="text"
                     className="col-span-3"
+                    onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                      setInvoiceName(e.currentTarget.value)
+                    }
                   />
                 </div>
-
-                <Button type="submit">Add User</Button>
+                <Button disabled={loading} type="submit" className="text-base">
+                  {loading ? "Adding..." : "Add"}
+                </Button>
               </div>
             </form>
           </DialogDescription>
