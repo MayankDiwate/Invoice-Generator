@@ -55,6 +55,8 @@ const AddProductSheet = () => {
 
     const data = await res.json();
 
+    console.log(data["product"]);
+
     setOpen(false);
     dispatch(addProduct(data["product"]));
 
@@ -62,9 +64,9 @@ const AddProductSheet = () => {
       toast.error(data.message);
     }
 
-    navigate(`/${data['product']._id}`);
+    navigate(`/${data["product"]._id}`);
 
-    if(data.message === "Product added successfully") {
+    if (data.message === "Product added successfully") {
       toast.success(data.message);
     } else {
       toast.error(data.message);

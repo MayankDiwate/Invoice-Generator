@@ -2,13 +2,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import {
-  signInFailure,
-  signInStart,
-  signInSuccess,
-} from "../redux/slices/userSlice";
-import { RootState } from "../redux/store";
 
 export type SignUpType = {
   username: string;
@@ -24,8 +17,9 @@ const SignUp = () => {
   });
   const [passwordType, setPasswordType] = useState("password");
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state: RootState) => state.user);
+  // const dispatch = useAppDispatch();
+  // const { loading, error } = useAppSelector((state: RootState) => state.user);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     setFormData({
@@ -42,7 +36,7 @@ const SignUp = () => {
     }
 
     try {
-      dispatch(signInStart());
+      setLoading(true);
       const res = await fetch("http://localhost:5001/api/auth/signup", {
         method: "POST",
         credentials: "include",
@@ -55,16 +49,18 @@ const SignUp = () => {
       const data = await res.json();
 
       if (data.success === false) {
-        dispatch(signInFailure(data.message));
-        console.log(error);
+        setLoading(false);
+        // dispatch(signInFailure(data.message));
         toast.error(data.message);
         return;
       }
-      dispatch(signInSuccess(data));
+
+      setLoading(false);
       toast.success("User registered successfully");
       navigate("/signin");
     } catch (error) {
-      dispatch(signInFailure((error as Error).message));
+      setLoading(false);
+      // dispatch(signInFailure((error as Error).message));
       toast.error((error as Error).message);
     }
   };

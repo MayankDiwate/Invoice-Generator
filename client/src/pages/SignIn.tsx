@@ -1,14 +1,9 @@
+import { signInSuccess } from "@/redux/slices/userSlice";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  signInFailure,
-  signInStart,
-  signInSuccess,
-} from "../redux/slices/userSlice";
-import { RootState } from "../redux/store";
 
 export type SignInType = {
   email: string;
@@ -23,7 +18,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [passwordType, setPasswordType] = useState("password");
-  const { loading } = useSelector((state: RootState) => state.user);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     setFormData({
@@ -40,7 +35,7 @@ const SignIn = () => {
     }
 
     try {
-      dispatch(signInStart());
+      setLoading(true);
       const res = await fetch("http://localhost:5001/api/auth/signin", {
         method: "POST",
         credentials: "include",
@@ -54,16 +49,17 @@ const SignIn = () => {
 
       console.log(data);
 
-      if (data.success === false) {
-        dispatch(signInFailure(data.message));
+      if (res.ok) {
+        setLoading(false);
+        dispatch(signInSuccess(data.user));
+        toast.success("User signed in successfully");
+        navigate("/");
+      } else {
+        setLoading(false);
         toast.error(data.message);
-        return;
       }
-      dispatch(signInSuccess(data));
-      toast.success("User signed in successfully");
-      navigate("/");
     } catch (error) {
-      dispatch(signInFailure((error as Error).message));
+      setLoading(false);
       toast.error((error as Error).message);
     }
   };

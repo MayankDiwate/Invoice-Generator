@@ -1,9 +1,8 @@
-import bcryptjs from "bcryptjs";
+import bcrypt from "bcrypt";
 import { config } from "dotenv";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model";
-import { errorHandler } from "../utils/error";
 config();
 
 export const signup = async (
@@ -14,27 +13,32 @@ export const signup = async (
   const { username, email, password } = req.body;
 
   if (!username) {
-    return next(errorHandler(500, "Username is required"));
+    return res.status(500).json({ message: "Username is required" });
   } else if (!email) {
-    return next(errorHandler(500, "Email is required"));
+    return res.status(500).json({ message: "Email is required" });
   } else if (!password) {
-    return next(errorHandler(500, "Password is required"));
+    return res.status(500).json({ message: "Password is required" });
   }
 
-  const hashedPassword = bcryptjs.hashSync(password, 10);
-  const newUser = new User({
-    username,
-    email,
-    password: hashedPassword,
-  });
+  const user = await User.findOne({ email });
 
-  const userExists = await User.findOne({ email });
-
-  if (userExists) {
-    return next(errorHandler(500, "User already exists"));
+  if (user) {
+    return res.status(400).json({ message: "User already exists" });
   }
 
   try {
+    const newUser = new User({
+      username,
+      email,
+      password,
+    });
+
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
     await newUser.save();
     const { password: pass, ...rest } = (newUser as any)._doc;
     res.status(201).json({ message: "User created successfully", user: rest });
@@ -54,21 +58,23 @@ export const signin = async (
     const user = await User.findOne({ email });
 
     if (!email || !password) {
-      return next(errorHandler(401, "All fields are required!"));
+      return res.status(400).json({ message: "Please fill in all fields" });
     }
 
     if (!user) {
-      return next(errorHandler(404, "User not found!"));
+      return res.status(404).json({ message: "User not found!" });
     }
 
-    const isMatch = bcryptjs.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return next(errorHandler(401, "Wrong password!"));
+      return res.status(400).json({ message: "Wrong password!" });
     }
 
-    const token = jwt.sign({ id: user._id }, 'NkCHChjrYthCqco4OWBtIgD0YhKP9Okr', {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      { id: user._id },
+      "NkCHChjrYthCqco4OWBtIgD0YhKP9Okr",
+      { expiresIn: "1d" }
+    );
 
     res.cookie("token", token, {
       httpOnly: true,

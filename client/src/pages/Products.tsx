@@ -9,34 +9,28 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { Invoice } from "@/Invoice";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
-import { Product } from "@/types/Product";
-import { UserType } from "@/types/User";
+import { usePDF } from "@react-pdf/renderer";
 import { ChevronRight, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
 const Products = () => {
-  const currentUser: {
-    message: string;
-    user: UserType;
-  } | null = useAppSelector((state: RootState) => state.user.currentUser);
-  const { products } = useAppSelector((state: RootState) => state.products);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [invoiceName, setInvoiceName] = useState("");
   const { id } = useParams();
-
-  const getTotal = () => {
-    const _total = products
-      .filter((product: Product) => product.invoiceId === id)
-      .map((product: Product) => product.rate * product.quantity)
-      .reduce((a, b) => a + b, 0);
-
-    setTotal(_total);
-  };
+  const currentUser = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
+  const { products } = useAppSelector((state: RootState) => state.products);
+  const filteredProducts = products.filter(
+    (product) => product.invoiceId === id
+  );
+  const [instance] = usePDF({
+    document: <Invoice id={id!} products={filteredProducts} />,
+  });
+  const [invoiceName, setInvoiceName] = useState("");
 
   const getInvoice = async () => {
     const response = await fetch("http://localhost:5001/api/invoice", {
@@ -46,7 +40,7 @@ const Products = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: currentUser!["user"]._id,
+        userId: currentUser?.user?._id,
       }),
     });
 
@@ -58,32 +52,8 @@ const Products = () => {
     setInvoiceName(data[0]["invoiceName"]);
   };
 
-  const handleGeneratePDF = async () => {
-    setLoading(true);
-    await fetch(`http://localhost:5001/api/product/generatePDF/${id}`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        invoiceName,
-        total,
-      }),
-    });
-
-    setLoading(false);
-    toast.success("PDF generated successfully!");
-    // toast.promise(handleGeneratePDF(), {
-    //   loading: "Downloading PDF...",
-    //   success: <b>PDF saved successfully.</b>,
-    //   error: <b>Could not save PDF.</b>,
-    // });
-  };
-
   useEffect(() => {
     getInvoice();
-    getTotal();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products.length]);
 
@@ -105,26 +75,27 @@ const Products = () => {
                 <ChevronRight />
               </BreadcrumbSeparator>
               <BreadcrumbItem>
-                <BreadcrumbLink href={`/${id}`}>
-                  <h1 className="text-xl font-bold text-black hover:bg-gray-100 p-1 px-2 hover:rounded-md">
-                    {invoiceName}
-                  </h1>
-                </BreadcrumbLink>
+                <h1 className="text-xl font-bold text-black hover:bg-gray-100 p-1 px-2 hover:rounded-md">
+                  {invoiceName}
+                </h1>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
 
           <div className="flex gap-2">
             <AddProductSheet />
-            <Button
-              size={"sm"}
-              className="flex gap-2"
-              onClick={handleGeneratePDF}
-              disabled={loading}
-            >
-              <Download size={16} />
-              <span>{loading ? "Downloading PDF..." : "Download PDF"}</span>
-            </Button>
+            <a href={instance.url!} download={"invoice.pdf"}>
+              <Button
+                size={"sm"}
+                className="flex gap-2"
+                disabled={instance.loading}
+              >
+                <Download size={16} />
+                <span className="hidden sm:block">
+                  {instance.loading ? "Downloading PDF..." : "Download PDF"}
+                </span>
+              </Button>
+            </a>
           </div>
         </div>
         <ProductsTable />

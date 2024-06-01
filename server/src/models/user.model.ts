@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import pkg from "validator";
 const { isEmail } = pkg;
@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 8);
+    this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });

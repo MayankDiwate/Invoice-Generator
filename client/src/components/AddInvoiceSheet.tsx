@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { addInvoice } from "@/redux/slices/invoiceSlice";
 import { RootState } from "@/redux/store";
-import { UserType } from "@/types/User";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -23,10 +22,9 @@ const AddInvoiceSheet = () => {
   const dispatch = useAppDispatch();
   const [invoiceName, setInvoiceName] = useState("");
   const [open, setOpen] = useState(false);
-  const currentUser: {
-    message: string;
-    user: UserType;
-  } | null = useAppSelector((state: RootState) => state.user.currentUser);
+  const currentUser = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,7 +37,7 @@ const AddInvoiceSheet = () => {
       },
       body: JSON.stringify({
         invoiceName,
-        userId: currentUser!["user"]._id,
+        userId: currentUser?.user?._id,
       }),
     });
 

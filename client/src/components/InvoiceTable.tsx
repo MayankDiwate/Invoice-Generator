@@ -9,17 +9,15 @@ import {
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { Invoice } from "@/types/Invoice";
-import { UserType } from "@/types/User";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 const InvoiceTable = () => {
   const navigate = useNavigate();
   const { invoices } = useAppSelector((state: RootState) => state.invoices);
   const [invoiceList, setInvoiceList] = useState<Invoice[]>([]);
-  const currentUser: {
-    message: string;
-    user: UserType;
-  } | null = useAppSelector((state: RootState) => state.user.currentUser);
+  const currentUser = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
 
   const getInvoices = async () => {
     const response = await fetch("http://localhost:5001/api/invoice", {
@@ -29,7 +27,7 @@ const InvoiceTable = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: currentUser!["user"]._id,
+        userId: currentUser?.user?._id,
       }),
     });
 
@@ -39,7 +37,7 @@ const InvoiceTable = () => {
 
   useEffect(() => {
     getInvoices();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoices.length]);
 
   return (

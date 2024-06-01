@@ -1,5 +1,5 @@
 import express from "express";
-import { addInvoice, getUserInvoices } from "../controllers/user.controller";
+import { addInvoice, getUserInvoices } from "../controllers/invoice.controller";
 import verifyToken from "../utils/verifyToken";
 
 const router = express.Router();
