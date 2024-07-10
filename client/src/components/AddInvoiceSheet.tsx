@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { addInvoice } from "@/redux/slices/invoiceSlice";
+import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -17,9 +16,8 @@ import {
 } from "./ui/dialog";
 
 const AddInvoiceSheet = () => {
-  const { loading } = useAppSelector((state: RootState) => state.invoices);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const [invoiceName, setInvoiceName] = useState("");
   const [open, setOpen] = useState(false);
   const currentUser = useAppSelector(
@@ -29,6 +27,7 @@ const AddInvoiceSheet = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setLoading(true);
     const res = await fetch("http://localhost:5001/api/invoice/addInvoice", {
       method: "POST",
       credentials: "include",
@@ -43,12 +42,19 @@ const AddInvoiceSheet = () => {
 
     const data = await res.json();
 
-    dispatch(addInvoice(data));
+    if (!res.ok) {
+      toast.error(data.message);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
     setOpen(false);
     navigate(`/${data["invoice"]["_id"]}`);
     if (data["message"] === "Invoice added successfully") {
       toast.success(data["message"]);
     } else {
+      setLoading(false);
       toast.error(data["message"]);
     }
   };

@@ -7,22 +7,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
 import { Product } from "@/types/Product";
+import { Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
 const ProductsTable = () => {
-  const { products } = useAppSelector((state: RootState) => state.products);
+  // const { products } = useAppSelector((state: RootState) => state.products);
+  // const dispatch = useAppDispatch();
   const [productList, setProductList] = useState<Product[]>([]);
   const { id } = useParams();
 
   const [total, setTotal] = useState(0);
 
   const getTotal = () => {
-    const _total = products
+    const _total = productList
       .filter((product: Product) => product.invoiceId === id)
       .map((product: Product) => product.rate * product.quantity)
       .reduce((a, b) => a + b, 0);
@@ -48,11 +48,31 @@ const ProductsTable = () => {
     setProductList(data);
   };
 
+  const deleteProductById = async (id: string) => {
+    const response = await fetch("http://localhost:5001/api/product", {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId: id,
+      }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message);
+    }
+
+    toast.success(data.message);
+  };
+
   useEffect(() => {
     getTotal();
     getProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [products.length]);
+  }, [productList]);
 
   return (
     <div>
@@ -78,6 +98,12 @@ const ProductsTable = () => {
                 <TableCell>₹{product.rate}</TableCell>
                 <TableCell className="text-right">
                   ₹{product.rate * product.quantity}
+                </TableCell>
+                <TableCell
+                  className="w-20 cursor-pointer"
+                  onClick={() => deleteProductById(product._id)}
+                >
+                  <Trash2 size={18} color="red" />
                 </TableCell>
               </TableRow>
             ))}

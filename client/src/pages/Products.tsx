@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Invoice } from "@/Invoice";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
+import { Product } from "@/types/Product";
 import { usePDF } from "@react-pdf/renderer";
 import { ChevronRight, Download } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -23,7 +24,7 @@ const Products = () => {
   const currentUser = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
-  const { products } = useAppSelector((state: RootState) => state.products);
+  const [products, setProducts] = useState<Product[]>([]);
   const filteredProducts = products.filter(
     (product) => product.invoiceId === id
   );
@@ -31,6 +32,26 @@ const Products = () => {
     document: <Invoice id={id!} products={filteredProducts} />,
   });
   const [invoiceName, setInvoiceName] = useState("");
+
+  const getInvoices = async () => {
+    const response = await fetch("http://localhost:5001/api/invoice", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: currentUser?.user?._id,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message);
+    }
+    setProducts(data);
+  };
 
   const getInvoice = async () => {
     const response = await fetch("http://localhost:5001/api/invoice", {
@@ -54,6 +75,7 @@ const Products = () => {
 
   useEffect(() => {
     getInvoice();
+    getInvoices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products.length]);
 

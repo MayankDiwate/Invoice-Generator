@@ -47,8 +47,6 @@ const SignIn = () => {
 
       const data = await res.json();
 
-      console.log(data);
-
       if (res.ok) {
         setLoading(false);
         dispatch(signInSuccess(data.user));

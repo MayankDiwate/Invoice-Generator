@@ -1,7 +1,7 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { config } from "dotenv";
-import express from "express";
+import express, { Response } from "express";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth";
 import invoiceRoutes from "./routes/invoice";
@@ -25,6 +25,9 @@ app.use(
 
 const PORT = process.env.PORT || 5000;
 
+app.get("/", (_, res: Response) => {
+  res.send("Api is running!");
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/invoice", invoiceRoutes);
 app.use("/api/product", productRoutes);

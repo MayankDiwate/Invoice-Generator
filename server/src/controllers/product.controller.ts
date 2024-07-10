@@ -50,3 +50,21 @@ export const getProducts = async (
     next(error.message);
   }
 };
+
+export const deleteProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { productId } = req.body;
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(500).json({ message: "Product not found" });
+    }
+    await Product.findByIdAndDelete(productId);
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error: any) {
+    next(error.message);
+  }
+};

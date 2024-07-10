@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAppDispatch } from "@/redux/hooks";
-import { addProduct } from "@/redux/slices/productSlice";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -18,7 +16,6 @@ import {
 import { Separator } from "./ui/separator";
 
 const AddProductSheet = () => {
-  const dispatch = useAppDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
   const [name, setName] = useState("");
@@ -55,22 +52,14 @@ const AddProductSheet = () => {
 
     const data = await res.json();
 
-    console.log(data["product"]);
-
-    setOpen(false);
-    dispatch(addProduct(data["product"]));
-
     if (!res.ok) {
       toast.error(data.message);
     }
 
-    navigate(`/${data["product"]._id}`);
+    setOpen(false);
 
-    if (data.message === "Product added successfully") {
-      toast.success(data.message);
-    } else {
-      toast.error(data.message);
-    }
+    navigate(`/${data["product"].invoiceId}`);
+    toast.success(data.message);
   };
 
   return (

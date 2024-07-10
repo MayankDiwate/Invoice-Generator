@@ -49,3 +49,21 @@ export const getUserInvoices = async (
     next(error.message);
   }
 };
+
+export const deleteInvoice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { invoiceId } = req.body;
+  try {
+    const invoice = await Invoice.findById(invoiceId);
+    if (!invoice) {
+      return next(errorHandler(500, "Invoice not found"));
+    }
+    await Invoice.findByIdAndDelete(invoiceId);
+    res.status(200).json({ message: "Invoice deleted successfully" });
+  } catch (error: any) {
+    next(error.message);
+  }
+};

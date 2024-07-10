@@ -1,3 +1,5 @@
+import { useAppDispatch } from "@/redux/hooks";
+import { signUpFailure, signUpSuccess } from "@/redux/slices/userSlice";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -17,8 +19,7 @@ const SignUp = () => {
   });
   const [passwordType, setPasswordType] = useState("password");
   const navigate = useNavigate();
-  // const dispatch = useAppDispatch();
-  // const { loading, error } = useAppSelector((state: RootState) => state.user);
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -50,17 +51,18 @@ const SignUp = () => {
 
       if (data.success === false) {
         setLoading(false);
-        // dispatch(signInFailure(data.message));
+        dispatch(signUpFailure(data.message));
         toast.error(data.message);
         return;
       }
 
       setLoading(false);
+      dispatch(signUpSuccess(data.user));
       toast.success("User registered successfully");
       navigate("/signin");
     } catch (error) {
       setLoading(false);
-      // dispatch(signInFailure((error as Error).message));
+      dispatch(signUpFailure((error as Error).message));
       toast.error((error as Error).message);
     }
   };
