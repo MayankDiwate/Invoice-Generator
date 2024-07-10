@@ -1,6 +1,6 @@
 import { Toaster } from "react-hot-toast";
 import { Provider } from "react-redux";
-import { Route, HashRouter as Router, Routes } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
@@ -12,7 +12,7 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <Router basename="/">
+        <Router>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/signin" element={<SignIn />} />
