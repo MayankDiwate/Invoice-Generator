@@ -14,8 +14,9 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Separator } from "./ui/separator";
+import { Product } from "@/types/Product";
 
-const AddProductSheet = () => {
+const AddProductSheet = ({addProduct}: {addProduct: (product: Product) => void}) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [name, setName] = useState("");
@@ -51,6 +52,7 @@ const AddProductSheet = () => {
     );
 
     const data = await res.json();
+    addProduct(data["product"]);
 
     if (!res.ok) {
       toast.error(data.message);

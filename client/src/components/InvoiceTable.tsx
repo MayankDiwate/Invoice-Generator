@@ -6,35 +6,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
 import { Invoice } from "@/types/Invoice";
 import { Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-const InvoiceTable = () => {
+const InvoiceTable = ({ invoiceList }: { invoiceList: Invoice[] }) => {
   const navigate = useNavigate();
-  const [invoiceList, setInvoiceList] = useState<Invoice[]>([]);
-  const currentUser = useAppSelector(
-    (state: RootState) => state.user.currentUser
-  );
-
-  const getInvoices = async () => {
-    const response = await fetch("http://localhost:5001/api/invoice", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: currentUser?.user?._id,
-      }),
-    });
-
-    const data = await response.json();
-    setInvoiceList(data);
-  };
 
   const deleteInvoiceById = async (id: string) => {
     const response = await fetch("http://localhost:5001/api/invoice", {
@@ -55,11 +32,6 @@ const InvoiceTable = () => {
 
     toast.success(data.message);
   };
-
-  useEffect(() => {
-    getInvoices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [invoiceList]);
 
   return (
     <>

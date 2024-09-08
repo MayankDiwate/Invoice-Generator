@@ -20,11 +20,12 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
 const Products = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productUpdated, setProductUpdated] = useState(true);
   const { id } = useParams();
   const currentUser = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
-  const [products, setProducts] = useState<Product[]>([]);
   const filteredProducts = products.filter(
     (product) => product.invoiceId === id
   );
@@ -53,6 +54,29 @@ const Products = () => {
     setProducts(data);
   };
 
+  const addProduct = (product: Product) => {
+    setProducts([...products, product]);
+    setProductUpdated(true);
+  };
+
+  const getProducts = async () => {
+    const response = await fetch(`http://localhost:5001/api/product/${id}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message);
+    }
+
+    setProducts(data);
+  };
+
   const getInvoice = async () => {
     const response = await fetch("http://localhost:5001/api/invoice", {
       method: "POST",
@@ -74,10 +98,18 @@ const Products = () => {
   };
 
   useEffect(() => {
+    if (productUpdated) {
+      getProducts();
+      setProductUpdated(false); 
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     getInvoice();
     getInvoices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [products.length]);
+  }, []);
 
   return (
     <div>
@@ -105,7 +137,7 @@ const Products = () => {
           </Breadcrumb>
 
           <div className="flex gap-2">
-            <AddProductSheet />
+            <AddProductSheet addProduct={addProduct} />
             <a href={instance.url!} download={"invoice.pdf"}>
               <Button
                 size={"sm"}
@@ -120,7 +152,7 @@ const Products = () => {
             </a>
           </div>
         </div>
-        <ProductsTable />
+        <ProductsTable productList={products}/>
       </div>
     </div>
   );

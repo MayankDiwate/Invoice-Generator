@@ -14,8 +14,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import { Invoice } from "@/types/Invoice";
 
-const AddInvoiceSheet = () => {
+const AddInvoiceSheet = ({ addInvoice }: { addInvoice: (invoice: Invoice) => void }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [invoiceName, setInvoiceName] = useState("");
@@ -41,6 +42,7 @@ const AddInvoiceSheet = () => {
     });
 
     const data = await res.json();
+    addInvoice(data["invoice"]);
 
     if (!res.ok) {
       toast.error(data.message);

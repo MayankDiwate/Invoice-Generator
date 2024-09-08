@@ -13,10 +13,10 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
-const ProductsTable = () => {
+const ProductsTable = ({productList}: {productList: Product[]}) => {
   // const { products } = useAppSelector((state: RootState) => state.products);
   // const dispatch = useAppDispatch();
-  const [productList, setProductList] = useState<Product[]>([]);
+ 
   const { id } = useParams();
 
   const [total, setTotal] = useState(0);
@@ -30,23 +30,7 @@ const ProductsTable = () => {
     setTotal(_total);
   };
 
-  const getProducts = async () => {
-    const response = await fetch(`http://localhost:5001/api/product/${id}`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      toast.error(data.message);
-    }
-
-    setProductList(data);
-  };
+  
 
   const deleteProductById = async (id: string) => {
     const response = await fetch("http://localhost:5001/api/product", {
@@ -70,7 +54,6 @@ const ProductsTable = () => {
 
   useEffect(() => {
     getTotal();
-    getProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productList]);
 
