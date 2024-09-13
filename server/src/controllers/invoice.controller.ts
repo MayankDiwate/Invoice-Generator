@@ -50,6 +50,25 @@ export const getUserInvoices = async (
   }
 };
 
+export const getUserInvoice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { invoiceId } = req.body;
+
+  try {
+    const invoice = await Invoice.findById(invoiceId);
+    if (!invoice) {
+      return next(errorHandler(500, "Invoice not found"));
+    }
+
+    res.status(200).json(invoice);
+  } catch (error: any) {
+    next(error.message);
+  }
+};
+
 export const deleteInvoice = async (
   req: Request,
   res: Response,
