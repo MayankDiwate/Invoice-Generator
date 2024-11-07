@@ -57,7 +57,7 @@ const InvoiceTable = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoiceList.map((invoice: Invoice, index) => {
+            {invoiceList.length > 0 ? invoiceList.map((invoice: Invoice, index) => {
               return (
                 <TableRow key={index}>
                   <TableCell className="font-medium">{invoice._id}</TableCell>
@@ -77,7 +77,7 @@ const InvoiceTable = ({
                   </TableCell>
                 </TableRow>
               );
-            })}
+            }) : <div>No Invoices Found!</div>}
           </TableBody>
         </Table>
       )}
