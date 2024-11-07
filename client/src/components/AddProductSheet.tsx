@@ -35,7 +35,7 @@ const AddProductSheet = ({addProduct}: {addProduct: (product: Product) => void})
     }
 
     const res = await fetch(
-      `http://localhost:5001/api/product/addProduct/${id}`,
+      `${import.meta.env.VITE_BASE_URL}/api/product/addProduct/${id}`,
       {
         method: "POST",
         credentials: "include",

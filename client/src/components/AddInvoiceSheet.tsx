@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
+import { Invoice } from "@/types/Invoice";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -14,9 +15,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { Invoice } from "@/types/Invoice";
 
-const AddInvoiceSheet = ({ addInvoice }: { addInvoice: (invoice: Invoice) => void }) => {
+const AddInvoiceSheet = ({
+  addInvoice,
+}: {
+  addInvoice: (invoice: Invoice) => void;
+}) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [invoiceName, setInvoiceName] = useState("");
@@ -29,17 +33,20 @@ const AddInvoiceSheet = ({ addInvoice }: { addInvoice: (invoice: Invoice) => voi
     e.preventDefault();
 
     setLoading(true);
-    const res = await fetch("http://localhost:5001/api/invoice/addInvoice", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        invoiceName,
-        userId: currentUser?.user?._id,
-      }),
-    });
+    const res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/invoice/addInvoice`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          invoiceName,
+          userId: currentUser?.user?._id,
+        }),
+      }
+    );
 
     const data = await res.json();
     addInvoice(data["invoice"]);
@@ -63,12 +70,8 @@ const AddInvoiceSheet = ({ addInvoice }: { addInvoice: (invoice: Invoice) => voi
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Button
-          size={"sm"}
-          className="flex gap-2"
-          onClick={() => setOpen(true)}
-        >
+      <DialogTrigger asChild>
+        <Button size={"sm"} className="flex gap-2">
           <Plus size={16} />
           Add Invoice
         </Button>
@@ -92,7 +95,7 @@ const AddInvoiceSheet = ({ addInvoice }: { addInvoice: (invoice: Invoice) => voi
                   />
                 </div>
                 <Button disabled={loading} type="submit" className="text-base">
-                  {loading ? "Adding..." : "Add"}
+                  <span>{loading ? "Adding..." : "Add"}</span>
                 </Button>
               </div>
             </form>

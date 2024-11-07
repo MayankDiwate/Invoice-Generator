@@ -10,20 +10,29 @@ import { Invoice } from "@/types/Invoice";
 import { Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-const InvoiceTable = ({ invoiceList }: { invoiceList: Invoice[] }) => {
+const InvoiceTable = ({
+  invoiceList,
+  isLoading,
+}: {
+  invoiceList: Invoice[];
+  isLoading: boolean;
+}) => {
   const navigate = useNavigate();
 
   const deleteInvoiceById = async (id: string) => {
-    const response = await fetch("http://localhost:5001/api/invoice", {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        invoiceId: id,
-      }),
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/invoice`,
+      {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          invoiceId: id,
+        }),
+      }
+    );
     const data = await response.json();
 
     if (!response.ok) {
@@ -37,7 +46,7 @@ const InvoiceTable = ({ invoiceList }: { invoiceList: Invoice[] }) => {
     <>
       {invoiceList.length === 0 ? (
         <div className="flex items-center justify-center h-[34rem] text-md mx-2">
-          No Invoices Found!
+          {isLoading ? "Loading..." : "No Invoices Found!"}
         </div>
       ) : (
         <Table>

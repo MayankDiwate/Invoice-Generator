@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 const Invoices = () => {
   const navigate = useNavigate();
   const [invoiceList, setInvoiceList] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(false);
   const currentUser = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
@@ -21,19 +22,24 @@ const Invoices = () => {
   });
 
   const getInvoices = async () => {
-    const response = await fetch("http://localhost:5001/api/invoice", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: currentUser?.user?._id,
-      }),
-    });
+    setLoading(true);
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/invoice`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: currentUser?.user?._id,
+        }),
+      }
+    );
 
     const data = await response.json();
     setInvoiceList(data);
+    setLoading(false);
   };
 
   const addInvoice = (invoice: Invoice) => {
@@ -53,7 +59,7 @@ const Invoices = () => {
           <h1 className="text-xl font-bold ml-2">Invoices</h1>
           <AddInvoiceSheet addInvoice={addInvoice} />
         </div>
-        <InvoiceTable invoiceList={invoiceList} />
+        <InvoiceTable invoiceList={invoiceList} isLoading={loading} />
       </div>
     </div>
   );

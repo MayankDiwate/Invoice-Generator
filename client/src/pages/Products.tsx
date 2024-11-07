@@ -10,8 +10,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Invoice } from "@/Invoice";
-import { useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
 import { Product } from "@/types/Product";
 import { usePDF } from "@react-pdf/renderer";
 import { ChevronRight, Download } from "lucide-react";
@@ -23,9 +21,6 @@ const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [productUpdated, setProductUpdated] = useState(true);
   const { id } = useParams();
-  const currentUser = useAppSelector(
-    (state: RootState) => state.user.currentUser
-  );
   const filteredProducts = products.filter(
     (product) => product.invoiceId === id
   );
@@ -34,39 +29,22 @@ const Products = () => {
   });
   const [invoiceName, setInvoiceName] = useState("");
 
-  const getInvoices = async () => {
-    const response = await fetch("http://localhost:5001/api/invoice", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: currentUser?.user?._id,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      toast.error(data.message);
-    }
-    setProducts(data);
-  };
-
   const addProduct = (product: Product) => {
     setProducts([...products, product]);
     setProductUpdated(true);
   };
 
   const getProducts = async () => {
-    const response = await fetch(`http://localhost:5001/api/product/${id}`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/product/${id}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const data = await response.json();
 
@@ -78,36 +56,38 @@ const Products = () => {
   };
 
   const getInvoice = async () => {
-    const response = await fetch("http://localhost:5001/api/invoice", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: currentUser?.user?._id,
-      }),
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/invoice/getInvoice`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          invoiceId: id,
+        }),
+      }
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
       toast.error(data.message);
     }
-    setInvoiceName(data[0]["invoiceName"]);
+    setInvoiceName(data.invoiceName);
   };
 
   useEffect(() => {
     if (productUpdated) {
       getProducts();
-      setProductUpdated(false); 
+      setProductUpdated(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     getInvoice();
-    getInvoices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -152,7 +132,7 @@ const Products = () => {
             </a>
           </div>
         </div>
-        <ProductsTable productList={products}/>
+        <ProductsTable productList={products} />
       </div>
     </div>
   );

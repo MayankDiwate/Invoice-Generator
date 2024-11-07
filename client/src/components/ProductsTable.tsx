@@ -33,7 +33,7 @@ const ProductsTable = ({productList}: {productList: Product[]}) => {
   
 
   const deleteProductById = async (id: string) => {
-    const response = await fetch("http://localhost:5001/api/product", {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/product`, {
       method: "DELETE",
       credentials: "include",
       headers: {

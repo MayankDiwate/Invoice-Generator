@@ -13,17 +13,10 @@ mongoose.connect(process.env.MONGO_CONNECTION_URL as string).then(() => {
 });
 
 const app = express();
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "", // Specify the allowed origin
-    credentials: true, // Allow credentials to be sent
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Specify allowed methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
-  })
-);
 
 const PORT = process.env.PORT || 5000;
 
