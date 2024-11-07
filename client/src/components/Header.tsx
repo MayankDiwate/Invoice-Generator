@@ -20,7 +20,7 @@ const Header = () => {
   );
 
   const handleSignOut = async () => {
-    await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/logout`, {
+    await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/signout`, {
       method: "POST",
       credentials: "include",
       headers: {
