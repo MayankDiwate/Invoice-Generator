@@ -1,4 +1,5 @@
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { resetUserState } from "@/redux/slices/userSlice";
 import { RootState } from "@/redux/store";
 import { LogOut, Mail, User } from "lucide-react";
 import toast from "react-hot-toast";
@@ -18,6 +19,7 @@ const Header = () => {
   const currentUser = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
+  const dispatch = useAppDispatch();
 
   const handleSignOut = async () => {
     await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/signout`, {
@@ -27,6 +29,8 @@ const Header = () => {
         "Content-Type": "application/json",
       },
     });
+
+    dispatch(resetUserState());
 
     toast.success("User logged out successfully!");
     navigate("/signin");
