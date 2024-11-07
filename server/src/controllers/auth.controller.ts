@@ -78,7 +78,9 @@ export const signin = async (
 
     res.cookie("token", token, {
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production", // true in production
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 
     const { password: pass, ...rest } = (user as any)._doc;
