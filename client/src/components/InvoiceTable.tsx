@@ -20,26 +20,30 @@ const InvoiceTable = ({
   const navigate = useNavigate();
 
   const deleteInvoiceById = async (id: string) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/api/invoice`,
-      {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          invoiceId: id,
-        }),
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/invoice`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            invoiceId: id,
+          }),
+        }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message);
       }
-    );
-    const data = await response.json();
 
-    if (!response.ok) {
-      toast.error(data.message);
+      toast.success(data.message);
+    } catch (error: any) {
+      toast.error(error.message);
     }
-
-    toast.success(data.message);
   };
 
   return (
@@ -49,37 +53,48 @@ const InvoiceTable = ({
           {isLoading ? "Loading..." : "No Invoices Found!"}
         </div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Id</TableHead>
-              <TableHead className="text-center">Invoice Name</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoiceList.length > 0 ? invoiceList.map((invoice: Invoice, index) => {
-              return (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{invoice._id}</TableCell>
-                  <TableCell
-                    className="text-center cursor-pointer hover:underline"
-                    onClick={() => {
-                      navigate(`/${invoice._id}`);
-                    }}
-                  >
-                    {invoice.invoiceName}
-                  </TableCell>
-                  <TableCell
-                    className="w-20"
-                    onClick={() => deleteInvoiceById(invoice._id)}
-                  >
-                    <Trash2 size={18} color="red" />
-                  </TableCell>
+        <>
+          {invoiceList.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Id</TableHead>
+                  <TableHead className="text-center">Invoice Name</TableHead>
                 </TableRow>
-              );
-            }) : <div>No Invoices Found!</div>}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {invoiceList.length > 0 &&
+                  invoiceList.map((invoice: Invoice, index) => {
+                    return (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">
+                          {invoice._id}
+                        </TableCell>
+                        <TableCell
+                          className="text-center cursor-pointer hover:underline"
+                          onClick={() => {
+                            navigate(`/${invoice._id}`);
+                          }}
+                        >
+                          {invoice.invoiceName}
+                        </TableCell>
+                        <TableCell
+                          className="w-20"
+                          onClick={() => deleteInvoiceById(invoice._id)}
+                        >
+                          <Trash2 size={18} color="red" />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="flex items-center justify-center h-[34rem] text-md">
+              No Invoices Found!
+            </div>
+          )}
+        </>
       )}
     </>
   );
