@@ -17,7 +17,7 @@ const Invoices = () => {
   );
 
   useEffect(() => {
-    if (!currentUser) {
+    if (!currentUser?.user) {
       navigate("/signin");
     }
   });

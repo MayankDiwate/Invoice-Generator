@@ -5,13 +5,12 @@ import {
   getUserInvoice,
   getUserInvoices,
 } from "../controllers/invoice.controller";
-import verifyToken from "../utils/verifyToken";
 
 const router = express.Router();
 
-router.post("/getInvoice", verifyToken, getUserInvoice);
-router.post("/", verifyToken, getUserInvoices);
-router.post("/addInvoice", verifyToken, addInvoice);
-router.delete("/", verifyToken, deleteInvoice);
+router.post("/getInvoice", getUserInvoice);
+router.post("/", getUserInvoices);
+router.post("/addInvoice", addInvoice);
+router.delete("/", deleteInvoice);
 
 export default router;
