@@ -8,17 +8,27 @@ import invoiceRoutes from "./routes/invoice";
 import productRoutes from "./routes/product";
 config();
 
-mongoose.connect(process.env.MONGO_CONNECTION_URL as string).then(() => {
-  console.log("Database connected successfully");
-});
-
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 5000;
+
+mongoose
+  .connect(process.env.MONGO_CONNECTION_URL as string)
+  .then(() => {
+    console.log("Database connected successfully");
+  })
+  .catch((error) => console.log(error));
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "*", // Specify the allowed origin
+    credentials: true, // Allow credentials to be sent
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Specify allowed methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const PORT = process.env.PORT || 5000;
 
 app.get("/", (_, res: Response) => {
   res.send("Api is running!");
