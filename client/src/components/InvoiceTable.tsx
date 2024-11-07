@@ -41,8 +41,8 @@ const InvoiceTable = ({
       }
 
       toast.success(data.message);
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error((error as Error).message);
     }
   };
 
