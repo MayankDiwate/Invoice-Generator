@@ -12,11 +12,11 @@ declare global {
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.token;
 
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
   try {
+    if (!token) {
+      return res.status(401).json({ message: "token not found" });
+    }
+
     const decoded = jwt.verify(token, "NkCHChjrYthCqco4OWBtIgD0YhKP9Okr");
     req.userId = (decoded as JwtPayload).userId;
     next();
