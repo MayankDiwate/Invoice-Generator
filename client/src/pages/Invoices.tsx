@@ -5,6 +5,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { Invoice } from "@/types/Invoice";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const Invoices = () => {
@@ -22,24 +23,29 @@ const Invoices = () => {
   });
 
   const getInvoices = async () => {
-    setLoading(true);
-    const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/api/invoice`,
-      {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser?.user?._id,
-        }),
-      }
-    );
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/invoice`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: currentUser?.user?._id,
+          }),
+        }
+      );
 
-    const data = await response.json();
-    setInvoiceList(data);
-    setLoading(false);
+      const data = await response.json();
+      setInvoiceList(data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      toast.error((error as Error).message);
+    }
   };
 
   const addInvoice = (invoice: Invoice) => {
