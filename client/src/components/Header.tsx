@@ -50,11 +50,11 @@ const Header = () => {
             <DropdownMenuSeparator />
             <DropdownMenuItem className="flex items-center gap-1 ml-1">
               <User size={18} />
-              {currentUser?.user?.username ?? "Username"}
+              {currentUser?.username ?? "Username"}
             </DropdownMenuItem>
             <DropdownMenuItem className="flex items-center gap-1 ml-1">
               <Mail size={16} />
-              {currentUser?.user?.email ?? "Email"}
+              {currentUser?.email ?? "Email"}
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
               <div
